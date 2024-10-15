@@ -54,12 +54,12 @@ void EtcdWatcher::watch_keys(std::string const &service_dir) {
         }
     }, true);
 
-    m_watcher->Wait([this](bool cancelled) {
+    m_watcher->Wait([this, service_dir](bool cancelled) {
         if (cancelled) {
             std::cout << "watcher's reconnect loop stopped as been cancelled" << std::endl;
             return;
         }
-        watch_keys();
+        watch_keys(service_dir);
     });
 }
 
