@@ -7,8 +7,6 @@
 
 #include <utility>
 
-static const std::string SERVICE_DIR{"/ondjoss"};
-
 EtcdWatcher *EtcdWatcher::make(const std::string &client_url, const std::string &service_name, EtcdWatcherDelegate *d) {
     auto *result = new EtcdWatcher(client_url, service_name);
     result->delegate = d;
@@ -21,23 +19,23 @@ EtcdWatcher::EtcdWatcher(const std::string &client_url, std::string service_name
 
 }
 
-void EtcdWatcher::start() {
-    watch_keys();
-    resolve();
+void EtcdWatcher::start(std::string const &service_dir) {
+    watch_keys(service_dir);
+    resolve(service_dir);
 }
 
 void EtcdWatcher::stop() {
     m_watcher->Cancel();
 }
 
-void EtcdWatcher::watch_keys() {
+void EtcdWatcher::watch_keys(std::string const &service_dir) {
     wait_for_connection();
     if (m_watcher && m_watcher->Cancelled()) {
         std::cout << "watcher's reconnect loop been cancelled\n";
         return;
     }
 
-    std::string root_path = SERVICE_DIR + "/" + m_service_name + "/";
+    std::string root_path = service_dir + "/" + m_service_name + "/";
     std::cout << "Watching " << root_path << " sn is " << m_service_name << " ...\n";
 
     m_watcher = std::make_unique<etcd::Watcher>(*m_client, root_path, [this](const etcd::Response &response) {
@@ -65,8 +63,8 @@ void EtcdWatcher::watch_keys() {
     });
 }
 
-void EtcdWatcher::resolve() {
-    std::string path = SERVICE_DIR + "/" + m_service_name + "/";
+void EtcdWatcher::resolve(std::string const &service_dir) {
+    std::string path = service_dir + "/" + m_service_name + "/";
     m_client->ls(path).then([this](pplx::task<etcd::Response> const &response_task) {
         const etcd::Response response = response_task.get();
         bool changed{false};

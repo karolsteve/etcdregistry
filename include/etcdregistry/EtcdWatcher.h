@@ -42,9 +42,9 @@ private:
 private:
     EtcdWatcher(std::string const &client_url, std::string service_name);
 
-    void watch_keys();
+    void watch_keys(std::string const &service_dir);
 
-    void resolve();
+    void resolve(std::string const &service_dir);
 
     void wait_for_connection();
 
@@ -53,7 +53,7 @@ private:
     bool remove_node(std::string const &k);
 
 public:
-    void start();
+    void start(std::string const &service_dir);
 
     void stop();
 
