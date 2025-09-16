@@ -43,8 +43,10 @@ void EtcdRegistry::timer_func() {
         } else {
             try {
                 m_keep_alive->Check();
+#ifdef AGGRESSIVE_DEBUG
                 DEBUG_D("Lease remaining time >>> lease is %ld. time : %d", m_lease_id,
                         m_client->leasetimetolive(m_lease_id).get().value().ttl());
+#endif
             } catch (std::exception const &keep_alive_ex) {
                 DEBUG_E("Error on keepalive. prepare to refresh lease id. error is %s", keep_alive_ex.what());
                 should_refresh_lease_id = true;
