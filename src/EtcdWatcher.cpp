@@ -39,8 +39,10 @@ void EtcdWatcher::watch_keys(std::string const &service_dir) {
     std::cout << "Watching " << root_path << " sn is " << m_service_name << " ...\n";
 
     m_watcher = std::make_unique<etcd::Watcher>(*m_client, root_path, [this](const etcd::Response &response) {
+#ifdef AGGRESSIVE_DEBUG
         DEBUG_D("EVENT OCCUR srv %s. action %s. key %s. value %s", m_service_name.c_str(),
                 response.action().c_str(), response.value().key().c_str(), response.value().as_string().c_str());
+#endif
 
         if (response.action() == "set" || response.action() == "launch") {
             if(add_node(response.value().key(), response.value().as_string())){
